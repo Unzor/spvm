@@ -3,7 +3,8 @@ SPWN version manager
 
 # Installation
 First, let's install it. 
-## Using NPM
+
+## Using NPM (recommended)
 Install [Node.js](nodejs.org) if you haven't, and run this:
 ```
 npm install -g spvm
