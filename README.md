@@ -1,13 +1,18 @@
 # spvm
 SPWN version manager
 
+# Installation
+First, let's install it. Install [Node.js](nodejs.org) if you haven't, and run this:
+```
+npm install -g spvm
+```
+You are now ready to use SPVM!
 # Usage
 To start, enter an administrative command prompt (to access SPWN folder), and install a SPWN version. For example, 0.0.4...
 ```
 spvm install 0.0.4
 ```
-It will tell us to insert our current SPWN version. Let's say we're using 0.0.8.
-
+It will tell us to insert our current SPWN version. Let's say we're using 0.0.8, but if you aren't, use whatever version you are using....
 Now that we have version 0.0.4, let's use it...
 ```
 spvm use 0.0.4
@@ -15,8 +20,7 @@ spvm use 0.0.4
 And now that we're using it, we should write some code.
 
 When we're done, let's uninstall it.
-First, let's switch back to 0.0.8...
-
+First, let's switch back to 0.0.8, or your own version...
 ```
 spvm use 0.0.8
 ```
