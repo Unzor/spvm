@@ -1,3 +1,22 @@
+#!/usr/bin/env node
+
+const {
+    promises: {
+        readdir
+    }
+} = require('fs')
+
+const {
+    readdirSync
+} = require('fs')
+
+const getDirectories = source =>
+    readdirSync(source, {
+        withFileTypes: true
+    })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
+
 var urlExists = require('url-exists');
 var fprompt = require('prompt-sync')();
 
@@ -172,10 +191,16 @@ if (command == 'uninstall') {
     }
 }
 
+if (command == 'list') {
+    var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',').map(x => version == x ? x + " <- (currently using)" : x).join('\n');
+    console.log(versions);
+}
+
 if (!command) {
     console.log(`SPVM version 1.0
 	Options:
 	- install: installs a version.
 	- use: switches to a SPWN version.
+	- list: lists all versions.
 	- uninstall: uninstalls a version.`)
 }
