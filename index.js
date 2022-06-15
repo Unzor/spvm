@@ -12,7 +12,7 @@ var urlExists = require('url-exists');
 var fprompt = require('prompt-sync')();
 var unzipper = require('unzipper');
 
-var version = '1.0.2';
+var version = '1.0.3';
 
 function download(v, f){
 	const fs = require('fs');
@@ -248,11 +248,45 @@ if (command == 'version') {
 	console.log(version);
 }
 
+function reset() {
+	var v = fprompt('What version would you like to reset to? ');
+	if (fs.existsSync('C:\\Program Files\\spwn\\'+v)) {
+		var versions = getDirectories('C:\\Program Files\\spwn').map(x=>x.includes('.')?x:null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',');
+		if (fs.existsSync('C:\\Program Files\\spwn\\'+v+'\\spwn.exe')) {
+			fse.moveSync('C:\\Program Files\\spwn\\'+v+'\\libraries', 'C:\\Program Files\\spwn\\libraries')
+			fs.renameSync('C:\\Program Files\\spwn\\'+v+'\\spwn.exe', 'C:\\Program Files\\spwn\\spwn.exe');
+		}
+		fs.unlinkSync('C:\\Program Files\\spwn\\tags.txt');
+		setTimeout(function(){
+			versions.forEach(function(file){
+				fs.rmSync('C:\\Program Files\\spwn\\'+file, {recursive: true});
+				console.log(file)
+			})
+		}, 1000)
+	} else {
+		console.log('Version is not installed! Try again.')
+		reset();
+	}
+}
+
+if (command == 'reset') {
+	var confirmed = fprompt('Would you like to reset? (This will remove all SPWN versions except the desired one and remove all files related to SPVM) (y/n) ');
+	confirmed = confirmed == 'y' || confirmed == 'Y' ? true : false
+	if (confirmed) {
+		reset();
+	} else {
+		console.log('Not confirmed, cancelling..');
+		process.exit(0);
+	}
+}
+
 if (!command) {
 	console.log(`SPVM version v${version}
 	Options:
 	- install: installs a version.
+	- uninstall: uninstalls a version.
 	- use: switches to a SPWN version.
-	- list: lists all versions.
-	- uninstall: uninstalls a version.`)
+	- reset: resets SPWN to clean-slate, uninstalling all versions & 
+	- version: shows current SPVM version.
+	- list: lists all versions.`)
 }
