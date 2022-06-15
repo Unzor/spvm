@@ -34,3 +34,5 @@ Now, let's uninstall 0.0.4...
 ```
 spvm uninstall 0.0.4
 ```
+# Why?
+I was trying to use a SPWN program, but it had deprecated stuff in code, and I didn't want to uninstall SPWN, install another SPWN version, uninstalling that SPWN version after I was done, then reinstalling the old SPWN version, so I just made a SPWN version manager instead.
