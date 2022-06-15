@@ -19,12 +19,18 @@ const getDirectories = source =>
 
 var urlExists = require('url-exists');
 var fprompt = require('prompt-sync')();
+var unzipper = require('unzipper');
 
 function download(v, f) {
     const fs = require('fs');
     const https = require('https');
     // File URL
-    const url = `https://spwn-downloads.seven7four4.repl.co/` + v.replaceAll(".", "") + '.msi';
+    var url;
+    if (v !== '0.0.2' && v !== '0.0.1') {
+        url = `https://spwn-downloads.seven7four4.repl.co/` + v.replaceAll(".", "") + '.msi';
+    } else {
+        url = `https://spwn-downloads.seven7four4.repl.co/` + v.replaceAll(".", "") + '.zip';
+    }
 
     urlExists(url, function(err, exists) {
         if (exists) {
@@ -32,7 +38,13 @@ function download(v, f) {
             https.get(url, (res) => {
 
                 // Open file in local filesystem
-                const file = fs.createWriteStream(`${v.replaceAll(".", "")}.msi`);
+                var filename;
+                if (v !== '0.0.2' && v !== '0.0.1') {
+                    filename = `${v.replaceAll(".", "")}.msi`;
+                } else {
+                    filename = `${v.replaceAll(".", "")}.zip`;
+                }
+                const file = fs.createWriteStream(filename);
 
                 // Write data into local file
                 res.pipe(file);
@@ -46,6 +58,7 @@ function download(v, f) {
                 });
 
             }).on("error", (err) => {
+                console.log(err)
                 console.log("Version not found! Exiting...");
                 process.exit(0);
             });
@@ -103,7 +116,29 @@ if (!fs.existsSync('C:/Program Files/spwn/tags.txt')) {
 var version = fs.readFileSync('C:/Program Files/spwn/tags.txt').toString();
 
 function use(v) {
-    if (version !== v) {
+    if (command == "use") {
+        if (version !== v) {
+            fse.renameSync('C:/Program Files/spwn/tags.txt', 'C:/Program Files/spwn/' + version + '/tags.txt')
+            fse.renameSync('C:/Program Files/spwn/spwn.exe', 'C:/Program Files/spwn/' + version + '/spwn.exe')
+            fse.moveSync('C:/Program Files/spwn/libraries', 'C:/Program Files/spwn/' + version + '/libraries')
+            if (command == 'use') {
+                console.log('Switching to ' + v + '...')
+            }
+            setTimeout(function() {
+                if (command == 'use') {
+                    console.log('Moving files...');
+                }
+                fse.renameSync('C:/Program Files/spwn/' + v + '/spwn.exe', 'C:/Program Files/spwn/spwn.exe')
+                fse.moveSync('C:/Program Files/spwn/' + v + '/libraries', 'C:/Program Files/spwn/libraries')
+                fse.moveSync('C:/Program Files/spwn/' + v + '/tags.txt', 'C:/Program Files/spwn/tags.txt')
+                if (command == 'use') {
+                    console.log('Switched to version ' + v + '.')
+                }
+            }, 1000)
+        } else {
+            console.log('Version is already being used!')
+        }
+    } else {
         fse.renameSync('C:/Program Files/spwn/tags.txt', 'C:/Program Files/spwn/' + version + '/tags.txt')
         fse.renameSync('C:/Program Files/spwn/spwn.exe', 'C:/Program Files/spwn/' + version + '/spwn.exe')
         fse.moveSync('C:/Program Files/spwn/libraries', 'C:/Program Files/spwn/' + version + '/libraries')
@@ -121,8 +156,6 @@ function use(v) {
                 console.log('Switched to version ' + v + '.')
             }
         }, 1000)
-    } else {
-        console.log('Version is already being used!')
     }
 }
 
@@ -152,25 +185,56 @@ if (command == 'use') {
 
 if (command == 'install') {
     if (arg) {
-        console.log('Installing version ' + arg + '... (Step 1: downloading...)')
-        download(arg, () => {
-            console.log('Installing version ' + arg + '... (Step 2: extracting...)')
-            var dir = 'C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', '') + '\\PFiles\\spwn'
-            spawnSync('msiexec /a ' + arg.replaceAll('.', '') + '.msi /qb TARGETDIR="C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', '') + "\"", {
-                shell: true,
-                detached: true
-            })
-            console.log('Installing version ' + arg + '... (Step 3: installing...)')
-            move_to_cv();
-            fs.unlinkSync(arg.replaceAll('.', '') + '.msi');
-            fse.moveSync(dir + '\\libraries', 'C:/Program Files/spwn/' + arg + '/libraries')
-            fs.renameSync(dir + '\\spwn.exe', 'C:/Program Files/spwn/' + arg + '/spwn.exe')
-            fs.writeFileSync('C:/Program Files/spwn/' + arg + '/tags.txt', arg)
-            fs.rmSync('C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', ''), {
-                recursive: true
+        if (arg !== '0.0.1' && arg !== '0.0.2') {
+            console.log('Installing version ' + arg + '... (Step 1: downloading...)')
+            download(arg, () => {
+                console.log('Installing version ' + arg + '... (Step 2: extracting...)')
+                var dir = 'C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', '') + '\\PFiles\\spwn'
+                spawnSync('msiexec /a ' + arg.replaceAll('.', '') + '.msi /qb TARGETDIR="C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', '') + "\"", {
+                    shell: true,
+                    detached: true
+                })
+                console.log('Installing version ' + arg + '... (Step 3: installing...)')
+                move_to_cv();
+                fs.unlinkSync(arg.replaceAll('.', '') + '.msi');
+                fse.moveSync(dir + '\\libraries', 'C:/Program Files/spwn/' + arg + '/libraries')
+                fs.renameSync(dir + '\\spwn.exe', 'C:/Program Files/spwn/' + arg + '/spwn.exe')
+                fs.writeFileSync('C:/Program Files/spwn/' + arg + '/tags.txt', arg)
+                fs.rmSync('C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', ''), {
+                    recursive: true
+                });
+                console.log('SPWN version ' + arg + ' installed! Switch to ' + arg + ' using "spvm use ' + arg + '".')
             });
-            console.log('SPWN version ' + arg + ' installed! Switch to ' + arg + ' using "spvm use ' + arg + '".')
-        });
+        } else {
+            console.log('Installing version ' + arg + '... (Step 1: downloading...)')
+            download(arg, () => {
+                console.log('Installing version ' + arg + '... (Step 2: extracting...)')
+                fs.renameSync(arg.replaceAll('.', '') + '.zip', 'C:\\Program Files\\spwn\\' + arg.replaceAll('.', '') + '.zip')
+                var dir;
+                if (arg == '0.0.1') {
+                    dir = 'C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', '') + '\\spwn-test'
+                } else {
+                    dir = 'C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', '') + '\\spwn-lang-win'
+                }
+                fs.createReadStream('C:\\Program Files\\spwn\\' + arg.replaceAll('.', '') + '.zip')
+                    .pipe(unzipper.Extract({
+                        path: 'C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', '')
+                    })).on('close', function(entry) {
+                        console.log('Installing version ' + arg + '... (Step 3: installing...)')
+                        setTimeout(() => {
+                            move_to_cv();
+                            fs.unlinkSync('C:\\Program Files\\spwn\\' + arg.replaceAll('.', '') + '.zip');
+                            fse.moveSync(dir + '\\libraries', 'C:/Program Files/spwn/' + arg + '/libraries')
+                            fs.renameSync(dir + '\\spwn.exe', 'C:/Program Files/spwn/' + arg + '/spwn.exe')
+                            fs.writeFileSync('C:/Program Files/spwn/' + arg + '/tags.txt', arg)
+                            fs.rmSync('C:\\Program Files\\spwn\\extracted_' + arg.replaceAll('.', ''), {
+                                recursive: true
+                            });
+                            console.log('SPWN version ' + arg + ' installed! Switch to ' + arg + ' using "spvm use ' + arg + '".')
+                        }, 500)
+                    });
+            });
+        }
     } else {
         console.log('No version specified, exiting...')
     }
@@ -179,9 +243,14 @@ if (command == 'install') {
 if (command == 'uninstall') {
     if (arg) {
         if (version !== arg) {
-            fs.rmSync('C:\\Program Files\\spwn\\' + arg, {
-                recursive: true
-            });
+            if (fs.existsSync('C:\\Program Files\\spwn\\' + arg)) {
+                fs.rmSync('C:\\Program Files\\spwn\\' + arg, {
+                    recursive: true
+                });
+            } else {
+                console.log('Version not installed or does not exists, exiting...')
+                process.exit(0);
+            }
             console.log('Version succesfully uninstalled.')
         } else {
             console.log('Version is currently in use! Please switch to another version before uninstalling this version.')
