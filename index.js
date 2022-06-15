@@ -12,7 +12,7 @@ var urlExists = require('url-exists');
 var fprompt = require('prompt-sync')();
 var unzipper = require('unzipper');
 
-var version = '1.0.3';
+var version = '1.0.2';
 
 function download(v, f){
 	const fs = require('fs');
