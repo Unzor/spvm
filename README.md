@@ -10,7 +10,7 @@ Install [Node.js](nodejs.org) if you haven't, and run this:
 npm install -g spvm
 ```
 ## Using .exe
-Click [here](https://github.com/Unzor/spvm/releases/download/v1.0.0/spvm.exe) to download. Note this does not get added to your PATH variable and you need to set it manually.
+Click [here](https://github.com/Unzor/spvm/releases/download/v1.0.0/spvm.exe) to download. Note this does not get added to your PATH and you need to set it manually.
 
 You are now ready to use SPVM!
 # Usage
