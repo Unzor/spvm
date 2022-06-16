@@ -271,7 +271,7 @@ if (command == 'uninstall') {
 }
 
 if (command == 'list') {
-    var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',').map(x => version == x ? x + " <- (currently using)" : x).join('\n');
+    var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') || x == 'latest' ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',').map(x => version == x ? x + " <- (currently using)" : x).join('\n');
     console.log(versions);
 }
 
