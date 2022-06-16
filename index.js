@@ -22,7 +22,7 @@ var fprompt = require('prompt-sync')();
 var unzipper = require('unzipper');
 var build = require('./builder');
 
-var version = '1.0.4';
+var version2 = '1.0.4';
 
 function download(v, f) {
     const fs = require('fs');
@@ -246,7 +246,7 @@ if (command == 'list') {
 }
 
 if (command == 'version') {
-    console.log(version);
+    console.log(version2);
 }
 
 function reset() {
@@ -284,7 +284,7 @@ if (command == 'reset') {
 }
 
 if (!command) {
-    console.log(`SPVM version v${version}
+    console.log(`SPVM version v${version2}
 	Options:
 	- install: installs a version.
 	- uninstall: uninstalls a version.
