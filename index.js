@@ -136,7 +136,7 @@ function use(v) {
 
 function move_to_cv() {
     if (fs.existsSync('C:/Program Files/spwn/spwn.exe')) {
-        if (!fs.existsSync('C:/Program Files/spwn/0.0.8')) {
+        if (!fs.existsSync('C:/Program Files/spwn/'+version)) {
             fs.mkdirSync('C:/Program Files/spwn/' + version)
         }
         use(version);
