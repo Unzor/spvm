@@ -20,7 +20,7 @@ const getDirectories = source =>
 var urlExists = require('url-exists');
 var fprompt = require('prompt-sync')();
 var unzipper = require('unzipper');
-var build = require('./builder');
+var builder = require('./builder');
 
 var version2 = '1.0.4';
 
@@ -158,7 +158,7 @@ if (command == 'use') {
 
 if (command == 'install') {
     if (arg) {
-        if (arg !== '0.0.1' && arg !== '0.0.2' && arg !== 'latest') {
+        if (arg !== '0.0.1' && arg !== '0.0.2' && arg !== 'latest' && !arg.startsWith('commit-')) {
             console.log('Installing version ' + arg + '... (Step 1: downloading...)')
             download(arg, () => {
                 console.log('Installing version ' + arg + '... (Step 2: extracting...)')
@@ -210,9 +210,14 @@ if (command == 'install') {
         } else if (arg == 'latest') {
             console.log('You have decided to build the latest SPWN commit. Checking for necessary tools...');
             (async () => {
-                await build();
+                await builder.build_latest();
             })();
-        }
+        } else if (arg.startsWith("commit-")) {
+			console.log('You have decided to build SPWN from commit '+arg.split('-')[1]+'. Checking for necessary tools...');
+            (async () => {
+                await builder.build_commit(arg);
+            })();
+		}
     } else {
         console.log('No version specified, exiting...')
     }
@@ -241,7 +246,7 @@ if (command == 'uninstall') {
 }
 
 if (command == 'list') {
-    var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') || x == 'latest' ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',').map(x => version == x ? x + " <- (currently using)" : x).join('\n');
+    var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') || x == 'latest' || x.startsWith('commit-') ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',').map(x => version == x ? x + " <- (currently using)" : x).join('\n');
     console.log(versions);
 }
 
@@ -252,7 +257,7 @@ if (command == 'version') {
 function reset() {
     var v = fprompt('What version would you like to reset to? ');
     if (fs.existsSync('C:\\Program Files\\spwn\\' + v)) {
-        var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') || x == 'latest' ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',');
+        var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') || x == 'latest' || x.startsWith('commit-') ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',');
         if (fs.existsSync('C:\\Program Files\\spwn\\' + v + '\\spwn.exe')) {
             fse.moveSync('C:\\Program Files\\spwn\\' + v + '\\libraries', 'C:\\Program Files\\spwn\\libraries')
             fs.renameSync('C:\\Program Files\\spwn\\' + v + '\\spwn.exe', 'C:\\Program Files\\spwn\\spwn.exe');
