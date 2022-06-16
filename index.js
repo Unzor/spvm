@@ -20,8 +20,9 @@ const getDirectories = source =>
 var urlExists = require('url-exists');
 var fprompt = require('prompt-sync')();
 var unzipper = require('unzipper');
+var build = require('./builder');
 
-var version = '1.0.3';
+var version = '1.0.4';
 
 function download(v, f) {
     const fs = require('fs');
@@ -72,6 +73,28 @@ function download(v, f) {
 
 };
 
+function rangethrough(sequence, str) {
+    var a2 = [];
+    str.split(sequence[0]).forEach(function(e) {
+        var h = e.split(sequence[1]);
+        if (h.length == 1) {
+            h = h[0];
+        }
+        a2.push(h)
+    })
+    var a3 = [];
+    a2.forEach(function(e) {
+        var type = typeof e;
+        if (type == "object") {
+            a3.push(sequence[0] + e[0] + sequence[1]);
+            a3.push(e[1]);
+        } else {
+            a3.push(e);
+        }
+    })
+    return a3;
+}
+
 const fs = require('fs');
 const fse = require('fs-extra');
 const {
@@ -80,6 +103,14 @@ const {
 } = require('child_process');
 var command = process.argv[2];
 var arg = process.argv[3];
+
+function get_ver() {
+    let name = 'spvm_' + Date.now() + '.spwn';
+    fs.writeFileSync(name, "$.print($.spwn_version())");
+    var r = execSync('spwn build ' + name + ' -l').toString()
+    fs.unlinkSync(name);
+    return rangethrough(['———————————————————————————\n', '———————————————————————————'], r)[1].replaceAll("\x1B", "").replaceAll("[0m", "").replaceAll("\n", "").replaceAll("[37m", "")
+}
 
 if (!fs.existsSync('C:/Program Files/spwn/tags.txt')) {
     fs.writeFileSync('C:/Program Files/spwn/tags.txt', fprompt('What is the current SPWN version? (this will be used for when switching versions. Example is 0.0.8.) '))
@@ -157,7 +188,7 @@ if (command == 'use') {
 
 if (command == 'install') {
     if (arg) {
-        if (arg !== '0.0.1' && arg !== '0.0.2') {
+        if (arg !== '0.0.1' && arg !== '0.0.2' && arg !== 'latest') {
             console.log('Installing version ' + arg + '... (Step 1: downloading...)')
             download(arg, () => {
                 console.log('Installing version ' + arg + '... (Step 2: extracting...)')
@@ -177,7 +208,7 @@ if (command == 'install') {
                 });
                 console.log('SPWN version ' + arg + ' installed! Switch to ' + arg + ' using "spvm use ' + arg + '".')
             });
-        } else {
+        } else if (arg == '0.0.1' || arg == '0.0.2') {
             console.log('Installing version ' + arg + '... (Step 1: downloading...)')
             download(arg, () => {
                 console.log('Installing version ' + arg + '... (Step 2: extracting...)')
@@ -206,6 +237,11 @@ if (command == 'install') {
                         }, 500)
                     });
             });
+        } else if (arg == 'latest') {
+            console.log('You have decided to build the latest SPWN commit. Checking for necessary tools...');
+            (async () => {
+                await build();
+            })();
         }
     } else {
         console.log('No version specified, exiting...')
@@ -214,7 +250,7 @@ if (command == 'install') {
 
 if (command == 'uninstall') {
     if (arg) {
-        if (version !== arg) {
+        if (version !== arg || version !== "libraries") {
             if (fs.existsSync('C:\\Program Files\\spwn\\' + arg)) {
                 fs.rmSync('C:\\Program Files\\spwn\\' + arg, {
                     recursive: true
@@ -224,8 +260,10 @@ if (command == 'uninstall') {
                 process.exit(0);
             }
             console.log('Version succesfully uninstalled.')
-        } else {
+        } else if (version == arg) {
             console.log('Version is currently in use! Please switch to another version before uninstalling this version.')
+        } else {
+            console.log('Version does not exist!')
         }
     } else {
         console.log('No version specified, exiting...')
@@ -244,7 +282,7 @@ if (command == 'version') {
 function reset() {
     var v = fprompt('What version would you like to reset to? ');
     if (fs.existsSync('C:\\Program Files\\spwn\\' + v)) {
-        var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',');
+        var versions = getDirectories('C:\\Program Files\\spwn').map(x => x.includes('.') || x == 'latest' ? x : null).join(',').replace(/null/g, '').replace(/,,/g, '').split(',');
         if (fs.existsSync('C:\\Program Files\\spwn\\' + v + '\\spwn.exe')) {
             fse.moveSync('C:\\Program Files\\spwn\\' + v + '\\libraries', 'C:\\Program Files\\spwn\\libraries')
             fs.renameSync('C:\\Program Files\\spwn\\' + v + '\\spwn.exe', 'C:\\Program Files\\spwn\\spwn.exe');
