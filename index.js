@@ -73,28 +73,6 @@ function download(v, f) {
 
 };
 
-function rangethrough(sequence, str) {
-    var a2 = [];
-    str.split(sequence[0]).forEach(function(e) {
-        var h = e.split(sequence[1]);
-        if (h.length == 1) {
-            h = h[0];
-        }
-        a2.push(h)
-    })
-    var a3 = [];
-    a2.forEach(function(e) {
-        var type = typeof e;
-        if (type == "object") {
-            a3.push(sequence[0] + e[0] + sequence[1]);
-            a3.push(e[1]);
-        } else {
-            a3.push(e);
-        }
-    })
-    return a3;
-}
-
 const fs = require('fs');
 const fse = require('fs-extra');
 const {
@@ -103,14 +81,6 @@ const {
 } = require('child_process');
 var command = process.argv[2];
 var arg = process.argv[3];
-
-function get_ver() {
-    let name = 'spvm_' + Date.now() + '.spwn';
-    fs.writeFileSync(name, "$.print($.spwn_version())");
-    var r = execSync('spwn build ' + name + ' -l').toString()
-    fs.unlinkSync(name);
-    return rangethrough(['———————————————————————————\n', '———————————————————————————'], r)[1].replaceAll("\x1B", "").replaceAll("[0m", "").replaceAll("\n", "").replaceAll("[37m", "")
-}
 
 if (!fs.existsSync('C:/Program Files/spwn/tags.txt')) {
     fs.writeFileSync('C:/Program Files/spwn/tags.txt', fprompt('What is the current SPWN version? (this will be used for when switching versions. Example is 0.0.8.) '))
