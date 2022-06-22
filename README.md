@@ -14,7 +14,7 @@ Click [here](https://github.com/Unzor/spvm/releases/download/v1.0.0/spvm.exe) to
 
 You are now ready to use SPVM!
 # Usage
-To start, enter an administrative command prompt (to access SPWN folder), and install a SPWN version. For example, 0.0.4...
+To start, enter an **administrative** command prompt (to access SPWN folder), and install a SPWN version. For example, 0.0.4...
 ```
 spvm install 0.0.4
 ```
