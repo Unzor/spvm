@@ -36,3 +36,7 @@ spvm uninstall 0.0.4
 ```
 # Why?
 I was trying to use a SPWN program, but it had deprecated stuff in code, and I didn't want to uninstall SPWN, install another SPWN version, uninstalling that SPWN version after I was done, then reinstalling the old SPWN version, nor did I want to modify the code, so I just made a SPWN version manager instead.
+
+# Advanced Usage
+- `spvm install latest`: Install SPWN from latest GitHub commit
+- `spvm install commit-x`: Install SPWN from specific commit (replace X with commit ID)
